@@ -1,0 +1,8 @@
+extends layout
+block content
+    h1 Autenticação
+    .w3-container
+        form.w3container(action="/api/users/login" method="POST")
+            input.w3-input(name="email" type="email" placeholder="Email" required)
+            input.w3-input(name="password" type="password" placeholder="Password" required)
+            input.w3-btn(type="submit" value="login")
