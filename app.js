@@ -24,7 +24,7 @@ var containerName = 'mongodb'//"localhost"
 const UserModel = require('./models/user')
 
 //Base de dados
-mongoose.connect('mongodb://' + containerName + ':27017/dweb13', {useNewUrlParser: true})
+mongoose.connect('mongodb://' + containerName + ':27017/vrauth', {useNewUrlParser: true})
   .then(() => console.log('Mongo ready: ' + mongoose.connection.readyState))
   .catch(error => console.error('Erro conexao: ' + error))
 
