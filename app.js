@@ -12,6 +12,8 @@ var FileStore = require('session-file-store')(session)
 
 require('./auth/auth')
 
+const axios = require('axios')
+
 const usersAPIRouter = require('./routes/api/users')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -19,6 +21,7 @@ var usersRouter = require('./routes/users');
 var app = express();
 
 var containerName = 'mongodb'//"localhost"
+const UserModel = require('./models/user')
 
 //Base de dados
 mongoose.connect('mongodb://' + containerName + ':27017/dweb13', {useNewUrlParser: true})
@@ -47,9 +50,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api/users', usersAPIRouter)
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/servicoautenticacao/api/users', usersAPIRouter)
+app.use('/servicoautenticacao', indexRouter);
+app.use('/servicoautenticacao/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -66,5 +69,9 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+UserModel.updateMany({}, {$set: {"token": ""}})
+  .then(dados => {console.log('ALTEROU COM SUCESSO: '); console.dir(dados)})
+  .catch(erro => console.log('Deu erro a limpar os tokens: ' + erro))
 
 module.exports = app;

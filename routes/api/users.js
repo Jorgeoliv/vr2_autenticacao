@@ -6,6 +6,8 @@ const axios = require('axios')
 const crypto = require('crypto');
 const sha256 = x => crypto.createHash('sha256').update(x, 'utf8').digest('hex');
 
+const fs = require('fs')
+
 const router = express.Router()
 
 //Registo de um utilizador
@@ -29,7 +31,7 @@ router.post('/registo', function(req, res, next) {
         console.log("Passport já atuou")
         console.log("User : " + user)
 
-        res.redirect("/users/login")
+        res.redirect("/servicoautenticacao/users/login")
         
         //return res.jsonp(user)
     })(req, res, next);
@@ -38,7 +40,6 @@ router.post('/registo', function(req, res, next) {
 //Login
 router.post('/login', async(req, res, next) => {
     console.log('Eu chegei ao login')
-    console.log('lalalala')
     passport.authenticate('login', async(err, user, info) => {
         console.log("AQUIII")
         try{
@@ -59,18 +60,12 @@ router.post('/login', async(req, res, next) => {
 
                 UserModel.updateOne({email: user.email}, {$set: {token: token}})
                 .then(_ =>{
-                    // console.log('O token é: ' + token)
-                    // console.dir(token)
-                    // console.log('=======================')
-                    // console.log('O utilizador é: ')
-                    // console.dir(myuser)
                     console.log('FIZ UM UPDATE UPDATE UPDATE UHUHUH')
-                    res.redirect('http://localhost:4000/enviaEmail?token='+token)
-                    //res.redirect('/api/users/' + user.email)
+                   res.redirect('http://' + req.hostname + ':80/servicoemail/enviaEmail?token='+token)
                 })
                 .catch(erroToken =>{
                     console.log("ERRO AO INSERIR TOKEN")
-                    res.redirect('http://localhost:4000/enviaEmail')
+                    res.redirect('http://' + req.hostname + ':80/servicoemail/enviaEmail')
                 })
 
             })
@@ -81,12 +76,37 @@ router.post('/login', async(req, res, next) => {
     })(req, res, next)
 })
 
+router.post('/logout', async(req, res, next) => {
+    if(req.body.email && req.body.token && req.body.token != ""){
+        // UserModel.findOne({email: req.body.email, token: req.body.token})
+        //         .then(user =>{
+                    UserModel.updateOne({email: req.body.email, token: req.body.token}, {$set: {token: ""}})
+                    .then(dados =>{
+                        console.log('FIZ UM LOGOUT: ')
+                        console.dir(dados)
+                        res.jsonp("Logout feito com sucesso")
+                    })
+                    .catch(erroToken =>{
+                        console.log("ERRO AO FAZER LOGOUT")
+                        res.jsonp("Erro ao fazer Logout")
+                    })
+                // })
+                // .catch()
+    }
+})
+
 router.get('/info', (req, res) => {
-    console.log('RECEBEMOS O TOKEN :::::: =>>=>=>=>')
-    console.dir(req.query.token)
-    UserModel.findOne({token: req.query.token}, {email: 1, _id: 0})
-        .then(email => res.jsonp(email))
-        .catch(erro => res.status(500).send('Erro na istagem de utilizadores ' + erro))
+    
+    if(req.query.token && req.query.token != ""){
+        console.log('RECEBEMOS O TOKEN :::::: =>>=>=>=>')
+        console.dir(req.query.token)
+        UserModel.findOne({token: req.query.token}, {email: 1, _id: 0})
+            .then(email => res.jsonp(email))
+            .catch(erro => res.status(500).send('Erro na istagem de utilizadores ' + erro))
+    }
+    else{
+        res.jsonp(null);
+    }
     
 })
 

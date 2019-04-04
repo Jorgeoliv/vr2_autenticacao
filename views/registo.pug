@@ -1,8 +1,8 @@
 extends layout
 block content
-    h1 Autenticação
+    h1 Registo
     .w3-container
-        form.w3container(action="/api/users/registo" method="POST")
-            input.w3-input(name="email" type="email" placeholder="Email" required)
-            input.w3-input(name="password" type="password" placeholder="Password" required)
-            input.w3-btn(type="submit" value="Registo")
+        form.w3container(action="/servicoautenticacao/api/users/registo" method="POST")
+            input.w3-input.w3-border-w3.light-grey(name="email" type="email" placeholder="Email" required)
+            input.w3-input.w3-border-w3.light-grey(name="password" type="password" placeholder="Password" required)
+            input.w3-btn.w3-blue-grey(type="submit" value="Registo")
